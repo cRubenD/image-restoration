@@ -9,7 +9,7 @@
 using namespace std;
 using namespace cv;
 
-Mat inpaintDamage(const Mat& image, const Mat& mask);
+Mat customInpaint(const Mat& image, const Mat& mask, int radius);
 
 Mat removeScratchLines(const Mat& image, const Mat& lineMask);
 
@@ -18,5 +18,8 @@ Mat restoreDamagedRegions(const Mat& image, const Mat& damageMask);
 Mat reduceNoise(const Mat& image, const Mat& noiseMask);
 
 Mat restoreColorDegradation(const Mat& image, const Mat& colorDegradationMask);
+
+Mat restoreImage(const Mat& image);
+
 
 #endif //LAB6_RESTORER_H

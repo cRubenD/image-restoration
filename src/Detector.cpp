@@ -63,11 +63,10 @@ Mat applySobelFilter(const Mat& grayscaleImage) {
 
 Mat detectScratchLines(const Mat& image) {
 
-    // preprocessing
     Mat grayscale = convertToGrayscale(image);
-    displayImage("gray", grayscale);
+    //displayImage("gray", grayscale);
     Mat edges = applySobelFilter(grayscale);
-    displayImage("Sobel Magnitude", edges);
+    //displayImage("Sobel Magnitude", edges);
     Mat thresholdedEdges = applyThreshold(edges, 60);
 
     // manual Hough
@@ -189,12 +188,24 @@ Mat detectDamageRegions(const Mat& image) {
     return closedMask;
 }
 
+void morphOpen(const Mat& src, Mat& dst, const Mat& kernel) {
+    Mat eroded(src.size(), src.type());
+    morphErode(src, eroded, kernel);
+    morphDilate(eroded, dst, kernel);
+}
+
+void morphClose(const Mat& src, Mat& dst, const Mat& kernel) {
+    Mat dilated(src.size(), src.type());
+    morphDilate(src, dilated, kernel);
+    morphErode(dilated, dst, kernel);
+}
+
 Mat detectNoise(const Mat& image) {
     Mat mask = Mat::zeros(image.size(), CV_8UC1);
     Mat smoothed(image.size(), image.type());
 
-    const int kernelSize = 5;
-    const float sigma = 1.5f;
+    const int kernelSize = 7;
+    const float sigma = 2.0f;
     vector<vector<float>> gaussianKernel = makeGaussianKernel(kernelSize, sigma);
     int halfSize = kernelSize / 2;
 
@@ -226,23 +237,26 @@ Mat detectNoise(const Mat& image) {
             Vec3b original = image.at<Vec3b>(y, x);
             Vec3b smooth = smoothed.at<Vec3b>(y, x);
 
+            // Calculate squared difference for better contrast
             difference.at<Vec3b>(y, x) = Vec3b(
-                    static_cast<uchar>(abs(original[0] - smooth[0])),
-                    static_cast<uchar>(abs(original[1] - smooth[1])),
-                    static_cast<uchar>(abs(original[2] - smooth[2]))
+                    min(255, (int)pow(abs(original[0] - smooth[0]), 2) / 16),
+                    min(255, (int)pow(abs(original[1] - smooth[1]), 2) / 16),
+                    min(255, (int)pow(abs(original[2] - smooth[2]), 2) / 16)
             );
         }
     }
 
     Mat grayDifference = convertToGrayscale(difference);
-    mask = applyThreshold(grayDifference, 15);
+    Mat adaptiveThreshold = adaptiveNoiseThreshold(grayDifference, 9, 1.0);
 
-    Mat kernel = getStructuringElement(MORPH_RECT, Size(3, 3));
-    Mat openedMask;
-    morphologyEx(mask, openedMask, MORPH_OPEN, kernel);
+    Mat kernel = Mat::ones(2, 2, CV_8UC1);
+    Mat openedMask, closedMask;
 
-    return openedMask;
+    morphOpen(adaptiveThreshold, openedMask, kernel);
 
+    morphClose(openedMask, closedMask, kernel);
+
+    return closedMask;
 }
 
 Mat detectColorDegradation(const Mat& image) {
@@ -261,7 +275,7 @@ Mat detectColorDegradation(const Mat& image) {
         }
     }
 
-    int k = 2; // raza kernel 5x5
+    int k = 2;
     Mat dil(rows, cols, CV_8UC1, Scalar(0));
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
