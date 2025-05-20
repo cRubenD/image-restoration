@@ -276,5 +276,4 @@ C:/Users/ruben/Downloads/opencv/build/include/opencv2/video.hpp
 C:/Users/ruben/Downloads/opencv/build/include/opencv2/video/tracking.hpp
 C:/Users/ruben/Downloads/opencv/build/include/opencv2/video/background_segm.hpp
 C:/Users/ruben/OneDrive/Desktop/School/Faculta/An3/Sem2/PI/Proiect/src/IOUtils.h
-C:/Users/ruben/OneDrive/Desktop/School/Faculta/An3/Sem2/PI/Proiect/src/Detector.h
 C:/Users/ruben/OneDrive/Desktop/School/Faculta/An3/Sem2/PI/Proiect/src/Restorer.h

@@ -10,10 +10,12 @@
 using namespace std;
 using namespace cv;
 
+// inpainting bazat pe difuzie
 Mat customInpaint(const Mat& image, const Mat& mask, int radius) {
     Mat result = image.clone();
     Mat workMask = mask.clone();
 
+    // calculam frontiera prima data dintre pixelii deteriorati si cei buni
     vector<pair<int, int>> boundary;
     for (int y = 0; y < image.rows; y++) {
         for (int x = 0; x < image.cols; x++) {
@@ -49,6 +51,7 @@ Mat customInpaint(const Mat& image, const Mat& mask, int radius) {
                 continue;
             }
 
+            // calculam media ponderata din vecinii buni
             Vec3f sum(0, 0, 0);
             float weightSum = 0;
 
@@ -78,6 +81,7 @@ Mat customInpaint(const Mat& image, const Mat& mask, int radius) {
                 result.at<Vec3b>(y, x) = newValue;
                 workMask.at<uchar>(y, x) = 0;
 
+                // am schimbat pixelul si acum ne extindem la venicii din frontiera
                 for (int dy = -1; dy <= 1; dy++) {
                     for (int dx = -1; dx <= 1; dx++) {
                         int ny = y + dy;
@@ -114,19 +118,13 @@ Mat customInpaint(const Mat& image, const Mat& mask, int radius) {
     return result;
 }
 
-Mat removeScratchLines(const Mat& image, const Mat& lineMask) {
-    return customInpaint(image, lineMask, 3);
-}
-
-// For restoring damaged regions
-Mat restoreDamagedRegions(const Mat& image, const Mat& damageMask) {
-    return customInpaint(image, damageMask, 5);
-}
-
+// filtru bilateral manual pentru netezirea imaginii in functie de greutatea spatiala si de culoare
+// pentru reducerea zgomotului
 Mat customBilateralFilter(const Mat& src, float sigmaSpace, float sigmaColor) {
     Mat dst = src.clone();
     int radius = static_cast<int>(sigmaSpace * 3.0f);
 
+    // calculul greutatilor spatiale
     vector<float> spatialWeights((2 * radius + 1) * (2 * radius + 1));
     int idx = 0;
     for (int dy = -radius; dy <= radius; dy++) {
@@ -161,6 +159,7 @@ Mat customBilateralFilter(const Mat& src, float sigmaSpace, float sigmaColor) {
 
                     float spaceWeight = spatialWeights[idx++];
 
+                    // calculul distantei de culoare
                     float colorDist = 0;
                     for (int c = 0; c < 3; c++) {
                         float diff = (float) centerPixel[c] - (float) currentPixel[c];
@@ -195,6 +194,7 @@ Mat restoreColorDegradation(const Mat& image, const Mat& colorDegradationMask) {
     for (int y = 0; y < image.rows; y++) {
         for (int x = 0; x < image.cols; x++) {
             if (colorDegradationMask.at<uchar>(y, x) > 0) {
+                // se foloseste o fereastra de 7 x 7 si se calculeaza o medie a culorilor
                 vector<Vec3b> samples;
                 int windowSize = 7;
                 int halfSize = windowSize / 2;
@@ -279,36 +279,26 @@ Mat reduceNoise(const Mat& image, const Mat& noiseMask) {
     return result;
 }
 
-Mat restoreImage(const Mat& image) {
-    Mat result = image.clone();
 
-    // Detect various degradations
-    Mat scratchMask = detectScratchLines(image);
-    Mat damageMask = detectDamageRegions(image);
-    Mat noiseMask = detectNoise(image);
-    Mat colorDegradationMask = detectColorDegradation(image);
-
-    // Display detected masks for debugging
-//    displayImage("Scratch Mask", scratchMask);
-//    displayImage("Damage Mask", damageMask);
-//    displayImage("Noise Mask", noiseMask);
-//    displayImage("Color Degradation Mask", colorDegradationMask);
-
-    Mat combinedMask = Mat::zeros(image.size(), CV_8UC1);
-    for (int y = 0; y < image.rows; y++) {
-        for (int x = 0; x < image.cols; x++) {
-            if (scratchMask.at<uchar>(y, x) > 0 || damageMask.at<uchar>(y, x) > 0) {
-                combinedMask.at<uchar>(y, x) = 255;
-            }
-        }
-    }
-
-
-    //result = customInpaint(result, combinedMask, 5);
-
-    //result = reduceNoise(result, noiseMask);
-
-    result = restoreColorDegradation(result, colorDegradationMask);
-
-    return result;
+// 1) Inpainting (scratch + damage)
+Mat doInpaint(const Mat& src) {
+    Mat scratchMask = detectScratchLines(src);
+    Mat damageMask  = detectDamageRegions(src);
+    Mat combined    = Mat::zeros(src.size(), CV_8UC1);
+    for(int y=0; y<src.rows; y++)
+        for(int x=0; x<src.cols; x++)
+            if (scratchMask.at<uchar>(y,x) || damageMask.at<uchar>(y,x))
+                combined.at<uchar>(y,x) = 255;
+    return customInpaint(src, combined, 5);
 }
+
+Mat doDenoise(const Mat& src) {
+    Mat noiseMask = detectNoise(src);
+    return reduceNoise(src, noiseMask);
+}
+
+Mat doColor(const Mat& src) {
+    Mat colorMask = detectColorDegradation(src);
+    return restoreColorDegradation(src, colorMask);
+}
+

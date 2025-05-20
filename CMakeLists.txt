@@ -19,4 +19,10 @@ add_executable(Lab6
         src/Helper.h
 )
 
+add_executable(TestApp
+        src/Test.cpp
+        src/Test.h
+)
+
 target_link_libraries(Lab6 ${OpenCV_LIBS})
+target_link_libraries(TestApp PRIVATE ${OpenCV_LIBS})

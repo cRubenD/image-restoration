@@ -280,7 +280,6 @@ CMakeFiles\Lab6.dir\main.cpp.obj: C:\Users\ruben\Downloads\opencv\build\include\
 CMakeFiles\Lab6.dir\main.cpp.obj: C:\Users\ruben\Downloads\opencv\build\include\opencv2\video\tracking.hpp
 CMakeFiles\Lab6.dir\main.cpp.obj: C:\Users\ruben\Downloads\opencv\build\include\opencv2\video\background_segm.hpp
 CMakeFiles\Lab6.dir\main.cpp.obj: C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\src\IOUtils.h
-CMakeFiles\Lab6.dir\main.cpp.obj: C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\src\Detector.h
 CMakeFiles\Lab6.dir\main.cpp.obj: C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\src\Restorer.h
 
 
@@ -1943,9 +1942,9 @@ C:\Users\ruben\Downloads\opencv\build\include\opencv2\video.hpp:
 
 C:\Users\ruben\Downloads\opencv\build\include\opencv2\video\background_segm.hpp:
 
-C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\src\Detector.h:
-
 C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\src\Restorer.h:
+
+C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\src\Detector.h:
 
 C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\src\Helper.h:
 

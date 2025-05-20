@@ -1,3 +1,4 @@
 C:/Users/ruben/OneDrive/Desktop/School/Faculta/An3/Sem2/PI/Proiect/cmake-build-debug/CMakeFiles/Lab6.dir
+C:/Users/ruben/OneDrive/Desktop/School/Faculta/An3/Sem2/PI/Proiect/cmake-build-debug/CMakeFiles/TestApp.dir
 C:/Users/ruben/OneDrive/Desktop/School/Faculta/An3/Sem2/PI/Proiect/cmake-build-debug/CMakeFiles/edit_cache.dir
 C:/Users/ruben/OneDrive/Desktop/School/Faculta/An3/Sem2/PI/Proiect/cmake-build-debug/CMakeFiles/rebuild_cache.dir

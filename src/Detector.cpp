@@ -13,6 +13,7 @@ using namespace cv;
 float sobelX[3][3] = { { -1,0,1 }, { -2,0,2 }, { -1,0,1 } };
 float sobelY[3][3] = { { -1,-2,-1 }, { 0,0,0 }, { 1,2,1 } };
 
+// calculeaza magnitudinea gradientului imaginii in fiecare punct
 Mat applySobelFilter(const Mat& grayscaleImage) {
 
     Mat gradX(grayscaleImage.size(), CV_32F, Scalar(0));
@@ -23,6 +24,7 @@ Mat applySobelFilter(const Mat& grayscaleImage) {
             float sumX = 0.0f;
             float sumY = 0.0f;
 
+            // pentru fiecare pixel se face convolutia cu cele doua nuclee
             for(int ky = -1; ky <= 1; ky++) {
                 for(int kx = -1; kx <= 1; kx++) {
                     float val = grayscaleImage.at<uchar>(y + ky, x + kx);
@@ -36,6 +38,7 @@ Mat applySobelFilter(const Mat& grayscaleImage) {
         }
     }
 
+    // calculam magnitudinea gradientului
     Mat magnitude(grayscaleImage.rows, grayscaleImage.cols, CV_32F);
     for(int y = 0; y < grayscaleImage.rows; y++) {
         for (int x = 0; x < grayscaleImage.cols; x++) {
@@ -51,6 +54,7 @@ Mat applySobelFilter(const Mat& grayscaleImage) {
     Mat normalizedMagnitude(grayscaleImage.rows, grayscaleImage.cols, CV_8UC1);
     if(maxVal > minVal){
 
+        // se scaleaza fiecare pixel a.i. cel mai mic gradient sa devina 0 iar cel mai mare 255
         for(int y = 0; y < grayscaleImage.rows; y++) {
             for (int x = 0; x < grayscaleImage.cols; x++) {
                 normalizedMagnitude.at<uchar>(y, x) = static_cast<uchar> (255 * (magnitude.at<float>(y, x) - minVal) / (maxVal - minVal));
@@ -61,6 +65,7 @@ Mat applySobelFilter(const Mat& grayscaleImage) {
     return normalizedMagnitude;
 }
 
+// detectam zgarieturi (linii)
 Mat detectScratchLines(const Mat& image) {
 
     Mat grayscale = convertToGrayscale(image);
@@ -120,6 +125,7 @@ Mat detectScratchLines(const Mat& image) {
     return mask;
 }
 
+// calculam media si deviatia standard pt pixelul curent in jurul unei ferestre pe cele 3 canale
 pair<Scalar, Scalar> calculateLocalStatistics(const Mat& image, int x, int y, int windowSize) {
     int halfSize = windowSize / 2;
     int count = 0;
@@ -159,6 +165,8 @@ Mat detectDamageRegions(const Mat& image) {
     const int windowSize = 11;
     const double thresholdDeviation = 2.0;
 
+    // pt fiecare pixel central, se compara abaterea fata de media locala cu un multiplu
+    // al deviatiei standard
     for(int y = windowSize / 2; y < image.rows - windowSize / 2; y++) {
         for(int x = windowSize / 2; x < image.cols - windowSize / 2; x++) {
             Scalar mean, stdDev;
@@ -181,8 +189,10 @@ Mat detectDamageRegions(const Mat& image) {
         }
     }
 
+    // dilatarea + eroziunea imaginii pe o masca de 3 x 3
     Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
     Mat closedMask;
+    // inchide golurile si uneste regiunile apropiate de masca initiala
     morphologyEx(mask, closedMask, MORPH_CLOSE, kernel);
 
     return closedMask;
@@ -204,6 +214,7 @@ Mat detectNoise(const Mat& image) {
     Mat mask = Mat::zeros(image.size(), CV_8UC1);
     Mat smoothed(image.size(), image.type());
 
+    // creeare kernel gaussian si filtrare
     const int kernelSize = 7;
     const float sigma = 2.0f;
     vector<vector<float>> gaussianKernel = makeGaussianKernel(kernelSize, sigma);
@@ -213,6 +224,7 @@ Mat detectNoise(const Mat& image) {
         for (int x = halfSize; x < image.cols - halfSize; x++) {
             Vec3f pixel_sum(0, 0, 0);
 
+            // convolutia manuala gaussiana
             for (int ky = -halfSize; ky <= halfSize; ky++) {
                 for (int kx = -halfSize; kx <= halfSize; kx++) {
                     Vec3b pixel = image.at<Vec3b>(y + ky, x + kx);
@@ -237,7 +249,7 @@ Mat detectNoise(const Mat& image) {
             Vec3b original = image.at<Vec3b>(y, x);
             Vec3b smooth = smoothed.at<Vec3b>(y, x);
 
-            // Calculate squared difference for better contrast
+            // calcularea diferentei patratice pt contrast mai bun
             difference.at<Vec3b>(y, x) = Vec3b(
                     min(255, (int)pow(abs(original[0] - smooth[0]), 2) / 16),
                     min(255, (int)pow(abs(original[1] - smooth[1]), 2) / 16),
@@ -256,6 +268,7 @@ Mat detectNoise(const Mat& image) {
 
     morphClose(openedMask, closedMask, kernel);
 
+    // rezultatul final e o masca binara, care indica exact pixelii afectati de zgomot
     return closedMask;
 }
 
@@ -263,6 +276,7 @@ Mat detectColorDegradation(const Mat& image) {
     int rows = image.rows, cols = image.cols;
     Mat mask(rows, cols, CV_8UC1, Scalar(0));
 
+    // detectam pixelii cu degradare de culoare si ii setam la alb
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
             const auto& bgr = image.at<Vec3b>(y,x);
@@ -275,6 +289,7 @@ Mat detectColorDegradation(const Mat& image) {
         }
     }
 
+    // dilatare manuala cu un patrat de 2k + 1
     int k = 2;
     Mat dil(rows, cols, CV_8UC1, Scalar(0));
     for (int y = 0; y < rows; y++) {
@@ -291,6 +306,7 @@ Mat detectColorDegradation(const Mat& image) {
         }
     }
 
+    // dilatare + eroziune manuala inchidem golurile interne
     Mat closed(rows, cols, CV_8UC1, Scalar(0));
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {

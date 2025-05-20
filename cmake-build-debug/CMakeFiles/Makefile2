@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Pr
 
 # The main recursive "all" target.
 all: CMakeFiles\Lab6.dir\all
+all: CMakeFiles\TestApp.dir\all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -61,6 +62,7 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles\Lab6.dir\clean
+clean: CMakeFiles\TestApp.dir\clean
 .PHONY : clean
 
 #=============================================================================
@@ -88,6 +90,32 @@ Lab6: CMakeFiles\Lab6.dir\rule
 CMakeFiles\Lab6.dir\clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Lab6.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\Lab6.dir\clean
 .PHONY : CMakeFiles\Lab6.dir\clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/TestApp.dir
+
+# All Build rule for target.
+CMakeFiles\TestApp.dir\all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TestApp.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TestApp.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\cmake-build-debug\CMakeFiles --progress-num=7,8 "Built target TestApp"
+.PHONY : CMakeFiles\TestApp.dir\all
+
+# Build rule for subdir invocation for target.
+CMakeFiles\TestApp.dir\rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\cmake-build-debug\CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\ruben\OneDrive\Desktop\School\Faculta\An3\Sem2\PI\Proiect\cmake-build-debug\CMakeFiles 0
+.PHONY : CMakeFiles\TestApp.dir\rule
+
+# Convenience name for target.
+TestApp: CMakeFiles\TestApp.dir\rule
+.PHONY : TestApp
+
+# clean rule for target.
+CMakeFiles\TestApp.dir\clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TestApp.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\clean
+.PHONY : CMakeFiles\TestApp.dir\clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

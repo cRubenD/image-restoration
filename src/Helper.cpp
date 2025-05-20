@@ -34,12 +34,14 @@ Mat applyThreshold(const Mat& image, uchar threshold) {
     return result;
 }
 
+// adaptive threshold, un prag local, bazat pe media si deviatia standard intr-o fereastra locala
 Mat adaptiveNoiseThreshold(const Mat& image, int windowSize, float k) {
     Mat result = Mat::zeros(image.size(), CV_8UC1);
     int halfWindow = windowSize / 2;
 
     for (int y = 0; y < image.rows; y++) {
         for (int x = 0; x < image.cols; x++) {
+            // calculam media locala
             float sum = 0;
             int count = 0;
 
@@ -58,6 +60,7 @@ Mat adaptiveNoiseThreshold(const Mat& image, int windowSize, float k) {
 
             float mean = count > 0 ? sum / (float) count : 0;
 
+            // calculam deviatia standard locala
             float variance = 0;
             for (int wy = -halfWindow; wy <= halfWindow; wy++) {
                 int ny = y + wy;
@@ -74,6 +77,7 @@ Mat adaptiveNoiseThreshold(const Mat& image, int windowSize, float k) {
 
             float stdDev = count > 0 ? sqrt(variance / (float) count) : 0;
 
+            // adaptive threshold
             float threshold = mean + k * stdDev;
             result.at<uchar>(y, x) = ((float) image.at<uchar>(y, x) > threshold) ? 255 : 0;
         }
@@ -82,11 +86,13 @@ Mat adaptiveNoiseThreshold(const Mat& image, int windowSize, float k) {
     return result;
 }
 
+// netezeste imaginea si atenueaza zgomotul de inalta frecventa
 vector<vector<float>> makeGaussianKernel(int kernelSize, float sigma) {
     vector<vector<float>> kernel(kernelSize, vector<float>(kernelSize));
     float sum = 0.0f;
     int halfSize = kernelSize / 2;
 
+    // calculam valoarea gaussiana pt fiecare pozitie
     for(int y = -halfSize; y <= halfSize; y++) {
         for(int x = -halfSize; x <= halfSize; x++) {
             float value = exp((float) -(x * x + y * y) / (2 * sigma * sigma));
@@ -95,6 +101,7 @@ vector<vector<float>> makeGaussianKernel(int kernelSize, float sigma) {
         }
     }
 
+    // normalizam astfel incat suma elementelor sa fie 1
     for (auto &row : kernel) {
         for (float &val : row) {
             val /= sum;
@@ -160,6 +167,7 @@ Vec3b hsv2bgr(const Vec3b& hsv) {
     };
 }
 
+// eliminarea zgomotului, micsoreaza punctele albe izolate
 void morphErode(const Mat& src, Mat& dst, const Mat& kernel) {
     dst = Mat::zeros(src.size(), src.type());
     int kernelRows = kernel.rows;
@@ -173,6 +181,8 @@ void morphErode(const Mat& src, Mat& dst, const Mat& kernel) {
 
             for (int ky = 0; ky < kernelRows && valid; ky++) {
                 for (int kx = 0; kx < kernelCols && valid; kx++) {
+                    // daca exista un pixel de fundal in zona acoperita de kernel, atunci pixelul
+                    // central se seteaza la pixelul de fundal
                     if (kernel.at<uchar>(ky, kx) > 0) {
                         int ny = y + (ky - kernelCenterY);
                         int nx = x + (kx - kernelCenterX);
@@ -191,7 +201,7 @@ void morphErode(const Mat& src, Mat& dst, const Mat& kernel) {
     }
 }
 
-// Custom implementation of dilation
+// implementare custom pt dilation
 void morphDilate(const Mat& src, Mat& dst, const Mat& kernel) {
     dst = Mat::zeros(src.size(), src.type());
     int kernelRows = kernel.rows;

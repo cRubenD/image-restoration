@@ -15,14 +15,11 @@ Mat loadImage(const String& path) {
 }
 
 void saveImage(const String& path, const Mat& image) {
-    bool flag = imwrite(path, image);
-    if(!flag) {
-        printf("Imaginea nu a putut fi salvata!");
-    } else printf("Imaginea a fost salvata cu succes");
+    imwrite(path, image);
 }
 
 void displayImage(const String& windowName, const Mat& image) {
-    namedWindow(windowName, WINDOW_AUTOSIZE);
+    namedWindow(windowName, WINDOW_GUI_NORMAL);
     imshow(windowName, image);
 }
 

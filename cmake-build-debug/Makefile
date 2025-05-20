@@ -118,6 +118,19 @@ Lab6\fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Lab6.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\Lab6.dir\build
 .PHONY : Lab6\fast
 
+#=============================================================================
+# Target rules for targets named TestApp
+
+# Build rule for target.
+TestApp: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 /nologo -$(MAKEFLAGS) TestApp
+.PHONY : TestApp
+
+# fast build rule for target.
+TestApp\fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TestApp.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\build
+.PHONY : TestApp\fast
+
 main.obj: main.cpp.obj
 .PHONY : main.obj
 
@@ -238,6 +251,30 @@ src\Restorer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Lab6.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\Lab6.dir\src\Restorer.cpp.s
 .PHONY : src\Restorer.cpp.s
 
+src\Test.obj: src\Test.cpp.obj
+.PHONY : src\Test.obj
+
+# target to build an object file
+src\Test.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TestApp.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\src\Test.cpp.obj
+.PHONY : src\Test.cpp.obj
+
+src\Test.i: src\Test.cpp.i
+.PHONY : src\Test.i
+
+# target to preprocess a source file
+src\Test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TestApp.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\src\Test.cpp.i
+.PHONY : src\Test.cpp.i
+
+src\Test.s: src\Test.cpp.s
+.PHONY : src\Test.s
+
+# target to generate assembly for a file
+src\Test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\TestApp.dir\build.make /nologo -$(MAKEFLAGS) CMakeFiles\TestApp.dir\src\Test.cpp.s
+.PHONY : src\Test.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -247,6 +284,7 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... Lab6
+	@echo ... TestApp
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
@@ -262,6 +300,9 @@ help:
 	@echo ... src/Restorer.obj
 	@echo ... src/Restorer.i
 	@echo ... src/Restorer.s
+	@echo ... src/Test.obj
+	@echo ... src/Test.i
+	@echo ... src/Test.s
 .PHONY : help
 
 
